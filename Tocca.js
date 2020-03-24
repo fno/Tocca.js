@@ -47,7 +47,8 @@
       dbltapThreshold: win.DBL_TAP_THRESHOLD || 200, // delay needed to detect a double tap
       longtapThreshold: win.LONG_TAP_THRESHOLD || 1000, // delay needed to detect a long tap
       tapPrecision: win.TAP_PRECISION / 2 || 60 / 2, // touch events boundaries ( 60px by default )
-      justTouchEvents: win.JUST_ON_TOUCH_DEVICES
+      justTouchEvents: win.JUST_ON_TOUCH_DEVICES,
+      ignoreEvents: win.IGNORE_EVENTS || []
     },
     // was initially triggered a "touchstart" event?
     wasTouch = false,
@@ -87,35 +88,38 @@
       return new Date().getTime()
     },
     sendEvent = function(elm, eventName, originalEvent, data) {
-      var customEvent = doc.createEvent('Event')
-      customEvent.originalEvent = originalEvent
-      data = data || {}
-      data.x = currX
-      data.y = currY
+      if(!defaults.ignoreEvents.includes(eventName)){
 
-      // jquery
-      if (defaults.useJquery) {
-        customEvent = jQuery.Event(eventName, {originalEvent: originalEvent})
-        jQuery(elm).trigger(customEvent, data)
-      }
+        var customEvent = doc.createEvent('Event')
+        customEvent.originalEvent = originalEvent
+        data = data || {}
+        data.x = currX
+        data.y = currY
 
-      // addEventListener
-      if (customEvent.initEvent) {
-        for (var key in data) {
-          customEvent[key] = data[key]
+        // jquery
+        if (defaults.useJquery) {
+          customEvent = jQuery.Event(eventName, {originalEvent: originalEvent})
+          jQuery(elm).trigger(customEvent, data)
         }
 
-        customEvent.initEvent(eventName, true, true)
-        elm.dispatchEvent(customEvent)
-      }
+        // addEventListener
+        if (customEvent.initEvent) {
+          for (var key in data) {
+            customEvent[key] = data[key]
+          }
 
-      // detect all the inline events
-      // also on the parent nodes
-      while (elm) {
+          customEvent.initEvent(eventName, true, true)
+          elm.dispatchEvent(customEvent)
+        }
+
+        // detect all the inline events
+        // also on the parent nodes
+        while (elm) {
         // inline
-        if (elm['on' + eventName])
-          elm['on' + eventName](customEvent)
-        elm = elm.parentNode
+          if (elm['on' + eventName])
+            elm['on' + eventName](customEvent)
+          elm = elm.parentNode
+        }
       }
 
     },

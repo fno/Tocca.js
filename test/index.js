@@ -669,4 +669,40 @@ describe('Tocca.js validate events', function() {
       })
     }, 500)
   })
+ /**
+   * Test the  ignoreEvents setting with the tap event
+   */
+    it('The "tap" event must not be triggered because it should be ignored', function(done) {
+      var eventObject = false
+
+      function onEventFired(e) {
+        check(done, function() {
+          eventObject = e
+          expect(true).to.be.equal(false)
+        })
+      }
+
+      testDiv.addEventListener('tap', onEventFired, false)
+
+      window.tocca({ignoreEvents:['tap']})
+
+      simulant.fire(testDiv, touchstart, {
+        clientX: 99,
+        clientY: 99
+      })
+
+      setTimeout(function() {
+        simulant.fire(testDiv, touchend, {
+          clientX: 99,
+          clientY: 99
+        })
+      }, 50);
+
+      setTimeout(function(){
+        check(done, function() {
+          expect(eventObject).to.be.equal(false)
+          testDiv.removeEventListener('tap', onEventFired, false)
+        })
+      },250);
+    })
 })

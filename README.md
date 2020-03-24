@@ -142,6 +142,7 @@ var SWIPE_THRESHOLD = 100, // default value
   TAP_PRECISION = 60 / 2, // default value (touch events boundaries)
   JUST_ON_TOUCH_DEVICES = false, // default value ( decide whether you want to use the Tocca.js events only on the touch devices )
   IGNORE_JQUERY = false; // default value ( will not use jQuery events, even if jQuery is detected )
+  IGNORE_EVENTS = [] // default value (list of events to ignore and not emit e.g. 'tap', 'swipeleft' etc)
 </script>
 <script src="path/to/Tocca.js"></script>
 ```
@@ -155,7 +156,8 @@ window.tocca({
   dbltapThreshold: your new option
   longtapThreshold: your new option
   tapPrecision: your new option
-  justTouchEvents: your new option
+  justTouchEvents: your new option,
+  ignoreEvents: your new option
 })
 
 console.log(window.tocca()) // will always return the current internal options
